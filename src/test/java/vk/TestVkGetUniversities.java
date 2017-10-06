@@ -6,7 +6,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static core.vk.VkGetUniversitiesConstants.*;
+import static core.vk.VkIntConstants.*;
+import static core.vk.VkTextConstants.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -17,11 +18,11 @@ public class TestVkGetUniversities {
     public void useBaseRequestAndResponseSpecifications() {
         RestAssured
                 .given(VkGetUniversitiesApi.baseRequestConfiguration())
-                .param(PARAM_SEARCH_QUERY, searchQuery)
-                .param(PARAM_COUNTRY_ID, countryId)
-                .param(PARAM_CITY_ID, cityId)
-                .param(PARAM_OFFSET, offset)
-                .param(PARAM_COUNT, count)
+                .param(PARAM_SEARCH_QUERY.text, SEARCH_QUERY.text)
+                .param(PARAM_COUNTRY_ID.text, COUNTRY_ID.number)
+                .param(PARAM_CITY_ID.text, CITY_ID.number)
+                .param(PARAM_OFFSET.text, OFFSET.number)
+                .param(PARAM_COUNT.text, COUNT.number)
                 .log().all()
                 .get().prettyPeek()
                 .then().specification(VkGetUniversitiesApi.successResponse());
@@ -30,11 +31,11 @@ public class TestVkGetUniversities {
     @Test
     public void reachBuilderUsage(){
         VkGetUniversitiesApi.with()
-                .searchQuery(searchQuery)
-                .countryId(countryId)
-                .cityId(cityId)
-                .offset(offset)
-                .count(count)
+                .searchQuery(SEARCH_QUERY.text)
+                .countryId(COUNTRY_ID.number)
+                .cityId(CITY_ID.number)
+                .offset(OFFSET.number)
+                .count(COUNT.number)
                 .callApi()
                 .then().specification(VkGetUniversitiesApi.successResponse());
     }
@@ -44,13 +45,13 @@ public class TestVkGetUniversities {
     public void validateSpellerAnswerAsAnObject() {
         List<VkGetUniversitiesAnswer> answers = VkGetUniversitiesApi.getVkGetUniversitiesAnswers(
                         VkGetUniversitiesApi.with()
-                                .searchQuery(searchQuery)
-                                .countryId(countryId)
-                                .cityId(cityId)
-                                .offset(offset)
-                                .count(count)
+                                .searchQuery(SEARCH_QUERY.text)
+                                .countryId(COUNTRY_ID.number)
+                                .cityId(CITY_ID.number)
+                                .offset(OFFSET.number)
+                                .count(COUNT.number)
                                 .callApi());
-        assertThat(answers.size(), lessThanOrEqualTo(Integer.parseInt(count)));
+        assertThat(answers.size(), lessThanOrEqualTo(COUNT.number));
         assertThat(answers.get(0).id, equalTo(1));
         assertThat(answers.get(0).title, equalTo("СПбГУ"));
         assertThat(answers.get(1).id, equalTo(13));

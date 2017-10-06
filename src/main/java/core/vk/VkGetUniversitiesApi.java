@@ -17,15 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import static core.vk.VkGetUniversitiesConstants.*;
+import static core.vk.VkTextConstants.*;
 import static org.hamcrest.Matchers.lessThan;
 
 public class VkGetUniversitiesApi {
-    //builder pattern
+    // builder pattern
     private VkGetUniversitiesApi() {
     }
 
-    private HashMap<String, String> params = new HashMap<String, String>();
+    private HashMap<String, String> params = new HashMap<>();
 
     public static class ApiBuilder {
         VkGetUniversitiesApi vkApi;
@@ -35,27 +35,27 @@ public class VkGetUniversitiesApi {
         }
 
         public VkGetUniversitiesApi.ApiBuilder searchQuery(String query) {
-            vkApi.params.put(PARAM_SEARCH_QUERY, query);
+            vkApi.params.put(PARAM_SEARCH_QUERY.text, query);
             return this;
         }
 
-        public VkGetUniversitiesApi.ApiBuilder countryId(String id) {
-            vkApi.params.put(PARAM_COUNTRY_ID, id);
+        public VkGetUniversitiesApi.ApiBuilder countryId(int id) {
+            vkApi.params.put(PARAM_COUNTRY_ID.text, String.valueOf(id));
             return this;
         }
 
-        public VkGetUniversitiesApi.ApiBuilder cityId(String id) {
-            vkApi.params.put(PARAM_CITY_ID, id);
+        public VkGetUniversitiesApi.ApiBuilder cityId(int id) {
+            vkApi.params.put(PARAM_CITY_ID.text, String.valueOf(id));
             return this;
         }
 
-        public VkGetUniversitiesApi.ApiBuilder offset(String value) {
-            vkApi.params.put(PARAM_OFFSET, value);
+        public VkGetUniversitiesApi.ApiBuilder offset(int value) {
+            vkApi.params.put(PARAM_OFFSET.text, String.valueOf(value));
             return this;
         }
 
-        public VkGetUniversitiesApi.ApiBuilder count(String numOfUni) {
-            vkApi.params.put(PARAM_COUNT, numOfUni);
+        public VkGetUniversitiesApi.ApiBuilder count(int numOfUni) {
+            vkApi.params.put(PARAM_COUNT.text, String.valueOf(numOfUni));
             return this;
         }
 
@@ -63,7 +63,7 @@ public class VkGetUniversitiesApi {
             return RestAssured.with()
                     .queryParams(vkApi.params)
                     .log().all()
-                    .get(VK_GET_UNI_API_URI).prettyPeek();
+                    .get(VK_GET_UNI_API_URI.text).prettyPeek();
         }
     }
 
@@ -78,10 +78,8 @@ public class VkGetUniversitiesApi {
         int beginIndex = responseStr.indexOf("{", 2);
         int endIndex = responseStr.lastIndexOf("]");
         String jsonStr = "[" + responseStr.substring(beginIndex, endIndex) + "]";
-        Type listType = new TypeToken<List<VkGetUniversitiesAnswer>>() {
-        }.getType();
-        List<VkGetUniversitiesAnswer> list = new Gson().fromJson(jsonStr, listType);
-        return list;
+        Type listType = new TypeToken<List<VkGetUniversitiesAnswer>>() {}.getType();
+        return new Gson().fromJson(jsonStr, listType);
     }
 
     //set base request and response specifications tu use in tests
@@ -97,9 +95,7 @@ public class VkGetUniversitiesApi {
     public static RequestSpecification baseRequestConfiguration() {
         return new RequestSpecBuilder()
                 .setAccept(ContentType.XML)
-                .addHeader("custom header1", "header1.value")
-                .addQueryParam("requestID", new Random().nextLong())
-                .setBaseUri(VK_GET_UNI_API_URI)
+                .setBaseUri(VK_GET_UNI_API_URI.text)
                 .build();
     }
 }

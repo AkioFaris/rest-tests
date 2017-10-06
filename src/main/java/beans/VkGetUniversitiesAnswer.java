@@ -31,7 +31,7 @@ public class VkGetUniversitiesAnswer {
         if (other == this) {
             return true;
         }
-        if ((other instanceof VkGetUniversitiesAnswer) == false) {
+        if (!(other instanceof VkGetUniversitiesAnswer)) {
             return false;
         }
         VkGetUniversitiesAnswer rhs = ((VkGetUniversitiesAnswer) other);
