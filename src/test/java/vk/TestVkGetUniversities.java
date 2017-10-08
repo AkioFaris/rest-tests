@@ -1,13 +1,19 @@
 package vk;
+
 import beans.VkGetUniversitiesAnswer;
 import core.vk.VkGetUniversitiesApi;
+import core.vk.enums.Universities;
 import io.restassured.RestAssured;
 import org.junit.Test;
 
 import java.util.List;
 
-import static core.vk.VkIntConstants.*;
-import static core.vk.VkTextConstants.*;
+import static core.vk.enums.Cities.SPB;
+import static core.vk.enums.Countries.RUS;
+import static core.vk.enums.QueryParamLabels.*;
+import static core.vk.enums.TestConstants.*;
+import static core.vk.enums.Universities.RIMSKY_KORSAKOV_SPBGK;
+import static core.vk.enums.Universities.SPBU;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -18,43 +24,53 @@ public class TestVkGetUniversities {
     public void useBaseRequestAndResponseSpecifications() {
         RestAssured
                 .given(VkGetUniversitiesApi.baseRequestConfiguration())
-                .param(PARAM_SEARCH_QUERY.text, SEARCH_QUERY.text)
-                .param(PARAM_COUNTRY_ID.text, COUNTRY_ID.number)
-                .param(PARAM_CITY_ID.text, CITY_ID.number)
-                .param(PARAM_OFFSET.text, OFFSET.number)
-                .param(PARAM_COUNT.text, COUNT.number)
+                .param(PARAM_SEARCH_QUERY.label, UNI_SEARCH_QUERY.text)
+                .param(PARAM_COUNTRY_ID.label, RUS.id)
+                .param(PARAM_CITY_ID.label, SPB.id)
+                .param(PARAM_OFFSET.label, SEARCH_RESULTS_OFFSET.number)
+                .param(PARAM_COUNT.label, SEARCH_RESULTS_COUNT.number)
                 .log().all()
                 .get().prettyPeek()
                 .then().specification(VkGetUniversitiesApi.successResponse());
     }
 
     @Test
-    public void reachBuilderUsage(){
+    public void reachBuilderUsage() {
         VkGetUniversitiesApi.with()
-                .searchQuery(SEARCH_QUERY.text)
-                .countryId(COUNTRY_ID.number)
-                .cityId(CITY_ID.number)
-                .offset(OFFSET.number)
-                .count(COUNT.number)
+                .searchQuery(UNI_SEARCH_QUERY.text)
+                .countryId(RUS.id)
+                .cityId(SPB.id)
+                .offset(SEARCH_RESULTS_OFFSET.number)
+                .count(SEARCH_RESULTS_COUNT.number)
                 .callApi()
                 .then().specification(VkGetUniversitiesApi.successResponse());
+    }
+
+    private int getOccurrencesInAnswers(List<VkGetUniversitiesAnswer> answers, Universities uni) {
+        int occurrences = 0;
+        for (VkGetUniversitiesAnswer answer : answers) {
+
+            if (answer.id == (uni.id) && answer.title.equals((uni.title)))
+                ++occurrences;
+        }
+        return occurrences;
     }
 
     //validate an object we've got in API response
     @Test
     public void validateSpellerAnswerAsAnObject() {
         List<VkGetUniversitiesAnswer> answers = VkGetUniversitiesApi.getVkGetUniversitiesAnswers(
-                        VkGetUniversitiesApi.with()
-                                .searchQuery(SEARCH_QUERY.text)
-                                .countryId(COUNTRY_ID.number)
-                                .cityId(CITY_ID.number)
-                                .offset(OFFSET.number)
-                                .count(COUNT.number)
-                                .callApi());
-        assertThat(answers.size(), lessThanOrEqualTo(COUNT.number));
-        assertThat(answers.get(0).id, equalTo(1));
-        assertThat(answers.get(0).title, equalTo("СПбГУ"));
-        assertThat(answers.get(1).id, equalTo(13));
-        assertThat(answers.get(1).title, equalTo("ВАШ при Администрации СПб"));
+                VkGetUniversitiesApi.with()
+                        .searchQuery(UNI_SEARCH_QUERY.text)
+                        .countryId(RUS.id)
+                        .cityId(SPB.id)
+                        .offset(SEARCH_RESULTS_OFFSET.number)
+                        .count(SEARCH_RESULTS_COUNT.number)
+                        .callApi());
+        assertThat(answers.size(), lessThanOrEqualTo(SEARCH_RESULTS_COUNT.number));
+        assertThat(answers.get(0).id, equalTo(SPBU.id));
+        assertThat(answers.get(0).title, equalTo(SPBU.title));
+
+        assertThat(getOccurrencesInAnswers(answers, RIMSKY_KORSAKOV_SPBGK), equalTo(1));
     }
 }

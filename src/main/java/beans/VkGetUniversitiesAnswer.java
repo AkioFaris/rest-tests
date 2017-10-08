@@ -1,4 +1,3 @@
-
 package beans;
 
 import com.google.gson.annotations.Expose;

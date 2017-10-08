@@ -15,56 +15,16 @@ import org.apache.http.HttpStatus;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
-import static core.vk.VkTextConstants.*;
+import static core.vk.enums.QueryParamLabels.*;
+import static core.vk.enums.TestConstants.VK_GET_UNI_API_URI;
 import static org.hamcrest.Matchers.lessThan;
 
 public class VkGetUniversitiesApi {
-    // builder pattern
-    private VkGetUniversitiesApi() {
-    }
-
     private HashMap<String, String> params = new HashMap<>();
 
-    public static class ApiBuilder {
-        VkGetUniversitiesApi vkApi;
-
-        private ApiBuilder(VkGetUniversitiesApi gcApi) {
-            vkApi = gcApi;
-        }
-
-        public VkGetUniversitiesApi.ApiBuilder searchQuery(String query) {
-            vkApi.params.put(PARAM_SEARCH_QUERY.text, query);
-            return this;
-        }
-
-        public VkGetUniversitiesApi.ApiBuilder countryId(int id) {
-            vkApi.params.put(PARAM_COUNTRY_ID.text, String.valueOf(id));
-            return this;
-        }
-
-        public VkGetUniversitiesApi.ApiBuilder cityId(int id) {
-            vkApi.params.put(PARAM_CITY_ID.text, String.valueOf(id));
-            return this;
-        }
-
-        public VkGetUniversitiesApi.ApiBuilder offset(int value) {
-            vkApi.params.put(PARAM_OFFSET.text, String.valueOf(value));
-            return this;
-        }
-
-        public VkGetUniversitiesApi.ApiBuilder count(int numOfUni) {
-            vkApi.params.put(PARAM_COUNT.text, String.valueOf(numOfUni));
-            return this;
-        }
-
-        public Response callApi() {
-            return RestAssured.with()
-                    .queryParams(vkApi.params)
-                    .log().all()
-                    .get(VK_GET_UNI_API_URI.text).prettyPeek();
-        }
+    // builder pattern
+    private VkGetUniversitiesApi() {
     }
 
     public static VkGetUniversitiesApi.ApiBuilder with() {
@@ -78,7 +38,8 @@ public class VkGetUniversitiesApi {
         int beginIndex = responseStr.indexOf("{", 2);
         int endIndex = responseStr.lastIndexOf("]");
         String jsonStr = "[" + responseStr.substring(beginIndex, endIndex) + "]";
-        Type listType = new TypeToken<List<VkGetUniversitiesAnswer>>() {}.getType();
+        Type listType = new TypeToken<List<VkGetUniversitiesAnswer>>() {
+        }.getType();
         return new Gson().fromJson(jsonStr, listType);
     }
 
@@ -97,5 +58,45 @@ public class VkGetUniversitiesApi {
                 .setAccept(ContentType.XML)
                 .setBaseUri(VK_GET_UNI_API_URI.text)
                 .build();
+    }
+
+    public static class ApiBuilder {
+        VkGetUniversitiesApi vkApi;
+
+        private ApiBuilder(VkGetUniversitiesApi gcApi) {
+            vkApi = gcApi;
+        }
+
+        public VkGetUniversitiesApi.ApiBuilder searchQuery(String query) {
+            vkApi.params.put(PARAM_SEARCH_QUERY.label, query);
+            return this;
+        }
+
+        public VkGetUniversitiesApi.ApiBuilder countryId(int id) {
+            vkApi.params.put(PARAM_COUNTRY_ID.label, String.valueOf(id));
+            return this;
+        }
+
+        public VkGetUniversitiesApi.ApiBuilder cityId(int id) {
+            vkApi.params.put(PARAM_CITY_ID.label, String.valueOf(id));
+            return this;
+        }
+
+        public VkGetUniversitiesApi.ApiBuilder offset(int value) {
+            vkApi.params.put(PARAM_OFFSET.label, String.valueOf(value));
+            return this;
+        }
+
+        public VkGetUniversitiesApi.ApiBuilder count(int numOfUni) {
+            vkApi.params.put(PARAM_COUNT.label, String.valueOf(numOfUni));
+            return this;
+        }
+
+        public Response callApi() {
+            return RestAssured.with()
+                    .queryParams(vkApi.params)
+                    .log().all()
+                    .get(VK_GET_UNI_API_URI.text).prettyPeek();
+        }
     }
 }
